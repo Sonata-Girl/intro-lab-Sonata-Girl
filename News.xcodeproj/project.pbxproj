@@ -33,7 +33,6 @@
 		678E945D298F039400A46C53 /* FullPageNews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullPageNews.swift; sourceTree = "<group>"; };
 		678E9460298FB89900A46C53 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 		678E9463298FC4F200A46C53 /* ImagesDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagesDataModel.swift; sourceTree = "<group>"; };
-		678E9465298FC5D100A46C53 /* NEED To Done.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "NEED To Done.md"; sourceTree = "<group>"; };
 		67E381C4298D52F700AA0E26 /* News.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = News.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67E381C7298D52F700AA0E26 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		67E381C9298D52F700AA0E26 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -90,7 +89,6 @@
 			isa = PBXGroup;
 			children = (
 				678E9451298E7EF600A46C53 /* README.md */,
-				678E9465298FC5D100A46C53 /* NEED To Done.md */,
 				678E9455298E7F1900A46C53 /* github */,
 				678E9453298E7F0000A46C53 /* gitattributes */,
 				67E381DB298D554800AA0E26 /* gitignore.io */,
