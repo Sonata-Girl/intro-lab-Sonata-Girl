@@ -116,9 +116,7 @@ final class DetaislVC: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
-        //        newsImageView.image = UIImage(named: newsTitle)
-        //        labelNewsTitle.text = newsTitle
-        //        labelViewsCount.numberOfLines = 0
+
         loadNewsDetails()
         setupUI()
     }
@@ -174,6 +172,7 @@ final class DetaislVC: UIViewController {
             mainView.bottomAnchor.constraint(equalTo: newsLink.bottomAnchor, constant: horizontalConstant),
             mainView.trailingAnchor.constraint(equalTo: newsLink.trailingAnchor, constant: horizontalConstant)
         ])
+        newsLink.addTarget(self, action: #selector(openFullPage), for: .touchUpInside)
         
         mainView.addSubview(newsSourceLabel)
         NSLayoutConstraint.activate([
@@ -198,5 +197,11 @@ final class DetaislVC: UIViewController {
         newsDateLabel.text = newsDetail?.Date
         newsLink.setTitle(newsDetail?.link, for: .normal)
         newsSourceLabel.text = newsDetail?.SourceName
+    }
+    
+    @objc private func openFullPage(sender: UIButton) {
+        let vc = FullPageNews()
+        vc.adressURL = sender.currentTitle ?? ""
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
