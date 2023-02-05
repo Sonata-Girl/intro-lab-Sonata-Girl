@@ -11,13 +11,23 @@ final class NewsTableViewCell: UITableViewCell {
     
     private let newsImageView: UIImageView = {
         var imageView = UIImageView()
-        imageView.layer.cornerRadius = 10
+        imageView.layer.cornerRadius = 5
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     
-    private let contentNewsStack: UIStackView = {
+    private let contentNewsStackleft: UIStackView = {
+        var stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 5
+        stack.contentMode = .scaleToFill
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
+    private let contentNewsStackRight: UIStackView = {
         var stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = 5
@@ -28,16 +38,25 @@ final class NewsTableViewCell: UITableViewCell {
     
     private let newsTitleLabel: UILabel = {
         var label = UILabel()
-        label.textColor = UIColor.black.withAlphaComponent(1)
-        label.font = .systemFont(ofSize: 20)
+        label.textColor = .black
+        label.font = .boldSystemFont(ofSize: 20)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
+        label.numberOfLines = 1
+        return label
+    }()
+    
+    private let newsDescriptionLabel: UILabel = {
+        var label = UILabel()
+        label.textColor = .lightGray
+        label.font = .systemFont(ofSize: 15)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 5
         return label
     }()
    
     private let viewsCountLabel: UILabel = {
         var label = UILabel()
-        label.textColor = UIColor.brown.withAlphaComponent(1)
+        label.textColor = .brown.withAlphaComponent(1)
         label.font = .systemFont(ofSize: 10)
         label.textAlignment = .right
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -60,37 +79,39 @@ final class NewsTableViewCell: UITableViewCell {
     private func configureCell() {
         let sideConstant: CGFloat = 16
         
-        contentView.addSubview(newsTitleLabel)
+        contentView.addSubview(contentNewsStackleft)
         NSLayoutConstraint.activate([
-            newsTitleLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            newsTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: sideConstant)
+            contentNewsStackleft.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            contentNewsStackleft.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: sideConstant)
         ])
         
-        contentView.addSubview(contentNewsStack)
+        contentNewsStackleft.addArrangedSubview(newsTitleLabel)
+        contentNewsStackleft.addArrangedSubview(newsDescriptionLabel)
+
+        contentView.addSubview(contentNewsStackRight)
         NSLayoutConstraint.activate([
-            contentView.trailingAnchor.constraint(equalTo: contentNewsStack.trailingAnchor, constant: 6),
-            contentView.bottomAnchor.constraint(equalTo: contentNewsStack.bottomAnchor),
+            contentNewsStackRight.leadingAnchor.constraint(equalTo: contentNewsStackleft.trailingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: contentNewsStackRight.trailingAnchor, constant: 6),
+            contentView.bottomAnchor.constraint(equalTo: contentNewsStackRight.bottomAnchor),
         ])
         
-        contentNewsStack.addArrangedSubview(newsImageView)
-        contentNewsStack.addArrangedSubview(viewsCountLabel)
+        contentNewsStackRight.addArrangedSubview(newsImageView)
+        contentNewsStackRight.addArrangedSubview(viewsCountLabel)
 
         NSLayoutConstraint.activate([
-            newsImageView.widthAnchor.constraint(equalToConstant: 60),
-            newsImageView.heightAnchor.constraint(equalToConstant: 50)
+            newsImageView.widthAnchor.constraint(equalToConstant: 100),
+            newsImageView.heightAnchor.constraint(equalToConstant: 100)
         ])
-        
     
-
     }
     
-    func configure(newsTitle: String, imageNews: UIImage?, viewsCount: Int) {
-        
-        let imageNews = imageNews ?? UIImage(named: "NoImage")
-        
-        newsTitleLabel.text = newsTitle
+    func configure(newsDetails: NewsDetails) {
+            
+        let imageNews = ImagesDataModel().loadImage(fileName: newsDetails.imageName)
         newsImageView.image = imageNews
-        viewsCountLabel.text = "👁️ " + String(viewsCount)
+        newsTitleLabel.text = newsDetails.title
+        newsDescriptionLabel.text = newsDetails.description
+        viewsCountLabel.text = "👁️ " + String(newsDetails.viewsCount)
     }
     
     override func prepareForReuse() {
@@ -98,6 +119,7 @@ final class NewsTableViewCell: UITableViewCell {
         newsTitleLabel.text = nil
         newsImageView.image = nil
         viewsCountLabel.text = nil
+        newsDescriptionLabel.text = nil        
     }
 }
 

@@ -9,6 +9,6 @@ import Foundation
 
 // MARK: - NewsDetails
 struct NewsDetails: Decodable {
-    let title, imageName: String
+    let title, imageName, description, Date, link, SourceName: String
     let viewsCount: Int
 }
