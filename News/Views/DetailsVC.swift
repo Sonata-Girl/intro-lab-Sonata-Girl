@@ -21,7 +21,7 @@ final class DetaislVC: UIViewController {
     //    Данные о новостях (заголовок, краткое содержание, ссылка на полную версию и тд.) и счетчик просмотров необходимо кэшировать каким-либо образом.
     //    Закэшированные данные отображаются перед отправлением запроса на обновление данных.
     //    Закэшированные данные доступны и после перезапуска приложения.
-    var newsDetail: NewsDetails? = nil
+    var newsDetail: NewsTableViewCellModel? = nil
     
     private let scrollView: UIScrollView = {
         var scroll = UIScrollView()
@@ -41,9 +41,9 @@ final class DetaislVC: UIViewController {
     private let newsTitleLabel: UILabel = {
         var label = UILabel()
         label.textColor = .black
-        label.font = .boldSystemFont(ofSize: 35)
+        label.font = .boldSystemFont(ofSize: 20)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
+        label.numberOfLines = 4
         return label
     }()
     
@@ -58,7 +58,7 @@ final class DetaislVC: UIViewController {
     private let descriptionNews: UITextView = {
         var textView = UITextView()
         textView.textColor = .black
-        textView.font = .systemFont(ofSize: 20)
+        textView.font = .systemFont(ofSize: 18)
         textView.translatesAutoresizingMaskIntoConstraints = false
         return textView
     }()
@@ -148,7 +148,8 @@ final class DetaislVC: UIViewController {
         NSLayoutConstraint.activate([
             newsTitleLabel.topAnchor.constraint(equalTo: scrollView.topAnchor),
             newsTitleLabel.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
-
+            newsTitleLabel.heightAnchor.constraint(equalTo: mainView.heightAnchor, multiplier: 0.15),
+            newsTitleLabel.widthAnchor.constraint(equalTo: mainView.heightAnchor, multiplier: 0.5),
         ])
         
         mainView.addSubview(newsImageView)
@@ -192,11 +193,11 @@ final class DetaislVC: UIViewController {
     private func loadNewsDetails() {
 
         newsTitleLabel.text = newsDetail?.title
-        newsImageView.image = ImagesDataModel().loadImage(fileName: newsDetail?.imageName ?? "")
+        newsImageView.image = UIImage(data: newsDetail?.imageData ?? Data())
         descriptionNews.text = newsDetail?.description
-        newsDateLabel.text = newsDetail?.Date
-        newsLink.setTitle(newsDetail?.link, for: .normal)
-        newsSourceLabel.text = newsDetail?.SourceName
+//        newsDateLabel.text = newsDetail?.
+//        newsLink.setTitle(newsDetail?.url, for: .normal)
+//        newsSourceLabel.text = newsDetail?.source.name
     }
     
     @objc private func openFullPage(sender: UIButton) {

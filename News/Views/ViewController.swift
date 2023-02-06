@@ -8,7 +8,8 @@ import UIKit
 
 final class ViewController: UIViewController {
     
-    var listOfTopNews = [NewsDetails]()
+    var listOfTopNews = [NewsTableViewCellModel]()
+    var listOfNewsDetails = [NewsDetails]()
     
     private let tableView: UITableView = {
             let tableView = UITableView()
@@ -20,8 +21,7 @@ final class ViewController: UIViewController {
         super.viewDidLoad()
         tableView.dataSource = self
         tableView.delegate = self
-        tableView.rowHeight = 130
-        
+       
         loadNews()
         setupNavBar()
        
@@ -59,28 +59,39 @@ final class ViewController: UIViewController {
     }
     
     private func loadNews() {
-//        
-//        DispatchQueue.main.async {
-//            NetworkService.shared.loadResults(params: ["query": "pasta", "maxFat": "25", "number": "10"]) { [weak self] (_ result: Result<ReceptsSearch, Error>) in
-//                switch result {
-//                case .success(let search):
-//                    self?.object = search
-//                    print(self?.object as Any)
-//                case .failure(let error):
-//                    print("Error: \(error.localizedDescription)")
-//                }
-//            }
-//        }
         
-        var description = "Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger. The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful."
-        let date = Date()
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd/MM/YYYY"
-        let dateString = formatter.string(from: date)
+        APIRequest.shared.getTopNews { [weak self] result in
+            switch result {
+            case .success(let articles):
+                self?.listOfTopNews = articles.compactMap({
+                    NewsTableViewCellModel(
+                        title: $0.title,
+                        description: $0.description ?? "No description",
+                        imageURL: URL(string: $0.urlToImage ?? "")
+                    )
+                })
+                
+                DispatchQueue.main.async {
+                    self?.tableView.reloadData()
+                }
+            case .failure(let error):
+                print(error)
+                
+            }
+        }
         
-        listOfTopNews.append(NewsDetails(title: "NEWS 1", imageName: "imageFirst", description: description, Date: dateString, link: "www.news1.com", SourceName: "Google",viewsCount: 4))
-        listOfTopNews.append(NewsDetails(title: "NEWS 2", imageName: "imageFirst", description: description, Date: dateString, link: "www.news2.com", SourceName: "NYTime",viewsCount: 45))
-        listOfTopNews.append(NewsDetails(title: "NEWS 3", imageName: "imageFirst", description: description, Date: dateString, link: "www.news3.com", SourceName: "RBK",viewsCount: 54))
+        //        var description = "Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger. The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful."
+//        let date = Date()
+//        let formatter = DateFormatter()
+//        formatter.dateFormat = "dd/MM/YYYY"
+//        let dateString = formatter.string(from: date)
+//
+//
+//        listOfTopNews.append(NewsDetails(title: "NEWS 1", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news1.com", source: Source(name: "Google")))
+//        listOfTopNews.append(NewsDetails(title: "NEWS 2", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news2/com", source: Source(name: "Google")))
+////        listOfTopNews.append(NewsDetails(title: "NEWS 3", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news3.com", source: Source(name: "Google"), viewsCount: 26))
+//        listOfTopNews.append(NewsDetails(title: "NEWS 3", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news3.com", source: Source(name: "Google")))
+//
     }
 
 }
@@ -93,19 +104,18 @@ extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.identifier, for: indexPath) as? NewsTableViewCell else {return UITableViewCell()}
 
-        let newsData = listOfTopNews[indexPath.row]
-        
-        cell.configure(newsDetails: newsData)
-                   
+        cell.configure(with: listOfTopNews[indexPath.row])            
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let dataCell = listOfTopNews[indexPath.row]
         let detailsVC = DetaislVC()
-        detailsVC.newsDetail = dataCell
+        detailsVC.newsDetail = listOfTopNews[indexPath.row]
         self.navigationController?.pushViewController(detailsVC, animated: true)
-        
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 130
     }
 }
 

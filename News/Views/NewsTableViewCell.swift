@@ -7,6 +7,22 @@
 
 import UIKit
 
+class NewsTableViewCellModel {
+    let title: String
+    let description: String?
+    let imageURL: URL?
+    var imageData : Data? = nil
+//    var viewsCount: Int
+   
+    init(title: String, description: String?, imageURL: URL?) {
+        self.title = title
+        self.description = description
+        self.imageURL = imageURL
+//        self.imageData = imageData
+//        self.viewsCount = viewsCount
+    }
+}
+
 final class NewsTableViewCell: UITableViewCell {
     
     private let newsImageView: UIImageView = {
@@ -22,7 +38,7 @@ final class NewsTableViewCell: UITableViewCell {
         var stack = UIStackView()
         stack.axis = .vertical
         stack.spacing = 5
-        stack.contentMode = .scaleToFill
+//        stack.contentMode = .scaleToFill
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
@@ -41,7 +57,7 @@ final class NewsTableViewCell: UITableViewCell {
         label.textColor = .black
         label.font = .boldSystemFont(ofSize: 20)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 1
+        label.numberOfLines = 2
         return label
     }()
     
@@ -50,7 +66,7 @@ final class NewsTableViewCell: UITableViewCell {
         label.textColor = .lightGray
         label.font = .systemFont(ofSize: 15)
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 5
+        label.numberOfLines = 4
         return label
     }()
    
@@ -105,13 +121,26 @@ final class NewsTableViewCell: UITableViewCell {
     
     }
     
-    func configure(newsDetails: NewsDetails) {
+    func configure(with viewModel: NewsTableViewCellModel) {
             
-        let imageNews = ImagesDataModel().loadImage(fileName: newsDetails.imageName)
-        newsImageView.image = imageNews
-        newsTitleLabel.text = newsDetails.title
-        newsDescriptionLabel.text = newsDetails.description
-        viewsCountLabel.text = "👁️ " + String(newsDetails.viewsCount)
+        if let data = viewModel.imageData {
+            newsImageView.image = UIImage(data: data)
+        }
+        else if let url = viewModel.imageURL {
+            URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
+                guard let data = data, error == nil else {
+                    return
+                }
+                viewModel.imageData = data
+                DispatchQueue.main.async {
+                    self?.newsImageView.image = UIImage(data: data)
+                }
+            }.resume()
+        }
+        newsTitleLabel.text = viewModel.title
+        newsDescriptionLabel.text = viewModel.description
+//        viewsCountLabel.text = "👁️ " + String(viewModel.viewsCount)
+//        viewsCountLabel.text = "👁️ " + String(55)
     }
     
     override func prepareForReuse() {
@@ -119,7 +148,7 @@ final class NewsTableViewCell: UITableViewCell {
         newsTitleLabel.text = nil
         newsImageView.image = nil
         viewsCountLabel.text = nil
-        newsDescriptionLabel.text = nil        
+        newsDescriptionLabel.text = nil
     }
 }
 
