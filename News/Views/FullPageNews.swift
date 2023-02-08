@@ -11,20 +11,19 @@ import WebKit
 final class FullPageNews: UIViewController {
     
     var adressURL: String = "www.google.com"
+    let webView = WKWebView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
-        let webView = WKWebView(frame: view.frame)
         view.addSubview(webView)
+        webView.frame = view.frame
         
         let adress = adressURL
         guard let url = URL(string: adress) else{ return}
         let request = URLRequest(url: url)
         
         webView.load(request)
-        
     }
     
 

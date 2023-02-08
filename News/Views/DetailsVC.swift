@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SafariServices
 
 final class DetaislVC: UIViewController {
     
@@ -21,7 +22,7 @@ final class DetaislVC: UIViewController {
     //    Данные о новостях (заголовок, краткое содержание, ссылка на полную версию и тд.) и счетчик просмотров необходимо кэшировать каким-либо образом.
     //    Закэшированные данные отображаются перед отправлением запроса на обновление данных.
     //    Закэшированные данные доступны и после перезапуска приложения.
-    var newsDetail: NewsTableViewCellModel? = nil
+    var newsDetail: NewsDetails? = nil
     
     private let scrollView: UIScrollView = {
         var scroll = UIScrollView()
@@ -90,17 +91,15 @@ final class DetaislVC: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
-    //
-    //    private let labelViewsCount: UILabel = {
-    //        var label = UILabel()
-    //        label.textColor = UIColor.brown.withAlphaComponent(1)
-    //        label.font = .systemFont(ofSize: 10)
-    //        label.translatesAutoresizingMaskIntoConstraints = false
-    //
-    //        return label
-    //    }()
-    //
-    //    var newsTitle = ""
+   
+    private let labelViewsCount: UILabel = {
+        var label = UILabel()
+        label.textColor = UIColor.brown.withAlphaComponent(1)
+        label.font = .systemFont(ofSize: 10)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        return label
+    }()
     
 //    init(newsDetail: NewsDetails?) {
 //        super.init(coder: <#T##NSCoder#>)
@@ -194,15 +193,16 @@ final class DetaislVC: UIViewController {
 
         newsTitleLabel.text = newsDetail?.title
         newsImageView.image = UIImage(data: newsDetail?.imageData ?? Data())
-        descriptionNews.text = newsDetail?.description
-//        newsDateLabel.text = newsDetail?.
-//        newsLink.setTitle(newsDetail?.url, for: .normal)
-//        newsSourceLabel.text = newsDetail?.source.name
+        descriptionNews.text = (newsDetail?.description ?? "") + (newsDetail?.description ?? "") + (newsDetail?.description ?? "")
+        newsDateLabel.text = newsDetail?.publishedAt
+        newsSourceLabel.text = newsDetail?.source.name
     }
     
     @objc private func openFullPage(sender: UIButton) {
-        let vc = FullPageNews()
-        vc.adressURL = sender.currentTitle ?? ""
+        guard let url = URL(string: newsDetail?.url ?? "") else {
+            return
+        }
+        let vc = SFSafariViewController(url: url)
         self.navigationController?.pushViewController(vc, animated: true)
     }
 }

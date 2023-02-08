@@ -17,7 +17,7 @@ final class APIRequest {
 
     private let key = "?apiKey=6af59f0f9cc241db9956aa76d5e0f55e"
 
-    public func getTopNews(completion: @escaping (Result<[NewsDetails], Error>) -> Void) {
+    public func getTopNews(completion: @escaping (Result<[Headers], Error>) -> Void) {
         guard let url = baseURL else {
             return
         }
@@ -30,6 +30,9 @@ final class APIRequest {
                 do {
                     let result = try JSONDecoder().decode(APIResponce.self, from: data)
                     print("Art \(result.articles.count)")
+//                    for i in result.articles {
+//                        print("Art \(i)")
+//                    }
                     completion(.success(result.articles))
                 }
                 catch {
@@ -42,5 +45,5 @@ final class APIRequest {
 }
 
 struct APIResponce: Codable {
-    let articles: [NewsDetails]
+    let articles: [Headers]
 }

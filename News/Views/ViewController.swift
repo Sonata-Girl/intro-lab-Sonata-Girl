@@ -8,8 +8,7 @@ import UIKit
 
 final class ViewController: UIViewController {
     
-    var listOfTopNews = [NewsTableViewCellModel]()
-    var listOfNewsDetails = [NewsDetails]()
+   var listOfNewsDetails = [NewsDetails]()
     
     private let tableView: UITableView = {
             let tableView = UITableView()
@@ -63,56 +62,66 @@ final class ViewController: UIViewController {
         APIRequest.shared.getTopNews { [weak self] result in
             switch result {
             case .success(let articles):
-                self?.listOfTopNews = articles.compactMap({
-                    NewsTableViewCellModel(
-                        title: $0.title,
-                        description: $0.description ?? "No description",
-                        imageURL: URL(string: $0.urlToImage ?? "")
+                self?.listOfNewsDetails = articles.compactMap({
+                    NewsDetails(title: $0.title,
+                                description: $0.description ?? "No description",
+                                url: $0.url,
+                                publishedAt: self?.convertIosDateToFormat(jsonDate: $0.publishedAt) ?? "",
+                                urlToImage: URL(string: $0.urlToImage ?? ""),
+                                viewsCount: 0,
+                                source: $0.source
                     )
                 })
-                
+        
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                 }
             case .failure(let error):
                 print(error)
-                
             }
         }
+    }
+    
+    private func convertIosDateToFormat(jsonDate: String) -> String {
+        let olDateFormatter = DateFormatter()
+        olDateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         
-        //        var description = "Make a symbolic breakpoint at UIViewAlertForUnsatisfiableConstraints to catch this in the debugger. The methods in the UIConstraintBasedLayoutDebugging category on UIView listed in <UIKitCore/UIView.h> may also be helpful."
-//        let date = Date()
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "dd/MM/YYYY"
-//        let dateString = formatter.string(from: date)
-//
-//
-//        listOfTopNews.append(NewsDetails(title: "NEWS 1", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news1.com", source: Source(name: "Google")))
-//        listOfTopNews.append(NewsDetails(title: "NEWS 2", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news2/com", source: Source(name: "Google")))
-////        listOfTopNews.append(NewsDetails(title: "NEWS 3", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news3.com", source: Source(name: "Google"), viewsCount: 26))
-//        listOfTopNews.append(NewsDetails(title: "NEWS 3", publishedAt: dateString, description: description, urlToImage: "imageFirst", url: "www.news3.com", source: Source(name: "Google")))
-//
+        let oldDate = olDateFormatter.date(from: jsonDate)
+        
+        let convertDateFormatter = DateFormatter()
+        convertDateFormatter.dateFormat = "MMM dd yyyy h:mm a"
+
+        guard let oldDate else {
+            return convertDateFormatter.string(from: Date())
+        }
+        return convertDateFormatter.string(from: oldDate)
     }
 
 }
 
 extension ViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listOfTopNews.count
+        return listOfNewsDetails.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.identifier, for: indexPath) as? NewsTableViewCell else {return UITableViewCell()}
 
-        cell.configure(with: listOfTopNews[indexPath.row])            
+        cell.configure(with: listOfNewsDetails[indexPath.row])
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let detailsVC = DetaislVC()
-        detailsVC.newsDetail = listOfTopNews[indexPath.row]
+        detailsVC.newsDetail = listOfNewsDetails[indexPath.row]
+        detailsVC.newsDetail?.viewsCount = (detailsVC.newsDetail?.viewsCount ?? 0) + 1
+        
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: NewsTableViewCell.identifier, for: indexPath) as? NewsTableViewCell else {return}
+        cell.configure(with: listOfNewsDetails[indexPath.row])
+       
         self.navigationController?.pushViewController(detailsVC, animated: true)
     }
+
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 130

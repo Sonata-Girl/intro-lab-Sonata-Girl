@@ -7,19 +7,25 @@
 
 import UIKit
 
-class NewsTableViewCellModel {
+final class NewsDetails: Codable {
     let title: String
     let description: String?
-    let imageURL: URL?
+    let url: String?
+    let publishedAt: String
+    let urlToImage: URL?
     var imageData : Data? = nil
-//    var viewsCount: Int
+    var viewsCount: Int?
+    let source: Source
    
-    init(title: String, description: String?, imageURL: URL?) {
+    init(title: String, description: String?, url: String?, publishedAt: String, urlToImage: URL?, imageData: Data? = nil, viewsCount: Int?, source: Source) {
         self.title = title
         self.description = description
-        self.imageURL = imageURL
-//        self.imageData = imageData
-//        self.viewsCount = viewsCount
+        self.url = url
+        self.publishedAt = publishedAt
+        self.urlToImage = urlToImage
+        self.imageData = imageData
+        self.viewsCount = viewsCount
+        self.source = source
     }
 }
 
@@ -121,12 +127,12 @@ final class NewsTableViewCell: UITableViewCell {
     
     }
     
-    func configure(with viewModel: NewsTableViewCellModel) {
+    func configure(with viewModel: NewsDetails) {
             
         if let data = viewModel.imageData {
             newsImageView.image = UIImage(data: data)
         }
-        else if let url = viewModel.imageURL {
+        else if let url = viewModel.urlToImage {
             URLSession.shared.dataTask(with: url) { [weak self] data, _, error in
                 guard let data = data, error == nil else {
                     return
@@ -139,7 +145,7 @@ final class NewsTableViewCell: UITableViewCell {
         }
         newsTitleLabel.text = viewModel.title
         newsDescriptionLabel.text = viewModel.description
-//        viewsCountLabel.text = "👁️ " + String(viewModel.viewsCount)
+        viewsCountLabel.text = "👁️ " + String(viewModel.viewsCount ?? 0)
 //        viewsCountLabel.text = "👁️ " + String(55)
     }
     
